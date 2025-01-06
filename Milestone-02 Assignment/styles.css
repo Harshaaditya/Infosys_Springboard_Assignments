@@ -1,0 +1,80 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background-color: #f4f4f4;
+    color: #333;
+  }
+  
+  /* Header Styles */
+  h1 {
+    background-color: #007bff;
+    color: white;
+    padding: 20px 0;
+    margin: 0;
+    font-size: 24px;
+  }
+  
+  /* Button Styles */
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    margin: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+  
+  button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Input Styles */
+  input[type="file"] {
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 14px;
+  }
+  
+  /* Result Section */
+  .result {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .result h3 {
+    color: #007bff;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .result p {
+    font-size: 16px;
+    margin: 5px 0;
+  }
+  
+  .result span {
+    font-weight: bold;
+  }
+  
+  /* Footer */
+  footer {
+    margin-top: 30px;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    font-size: 14px;
+  }
+  

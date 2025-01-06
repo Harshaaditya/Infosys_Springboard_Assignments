@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Sales Assistant</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <h1>🛒 AI Sales Assistant 🛒</h1>
+  <p>Interact with our Real-Time AI Sales Assistant!</p>
+
+  <!-- Recording Controls -->
+  <button id="recordBtn">🎙️ Start Recording</button>
+  <button id="stopBtn" disabled>🛑 Stop Recording</button>
+
+  <!-- Upload Controls -->
+  <input type="file" id="audioFile" accept="audio/wav" />
+  <button id="uploadBtn">📤 Upload Audio</button>
+
+  <!-- Results Section -->
+  <div class="result">
+    <h3>Transcribed Text:</h3>
+    <p id="transcription">Waiting for input...</p>
+
+    <h3>Analysis:</h3>
+    <p>Sentiment: <span id="sentiment"></span></p>
+    <p>Tone: <span id="tone"></span></p>
+    <p>Intent: <span id="intent"></span></p>
+
+    <h3>AI Response:</h3>
+    <p id="responseText">Waiting for response...</p>
+    <button id="playResponseBtn" disabled>▶️ Play Response Audio</button>
+    <audio id="recordedAudio" controls style="display: none;"></audio>
+  </div>
+
+  <script>
+    const recordBtn = document.getElementById('recordBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const audioFile = document.getElementById('audioFile');
+    const transcription = document.getElementById('transcription');
+    const sentiment = document.getElementById('sentiment');
+    const tone = document.getElementById('tone');
+    const intent = document.getElementById('intent');
+    const responseText = document.getElementById('responseText');
+    const playResponseBtn = document.getElementById('playResponseBtn');
+    const recordedAudio = document.getElementById('recordedAudio');
+
+    let mediaRecorder;
+    let recordedChunks = [];
+
+    // Function to start recording
+    recordBtn.onclick = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      recordedChunks = [];
+
+      mediaRecorder.start();
+      recordBtn.disabled = true;
+      stopBtn.disabled = false;
+      recordBtn.textContent = "🎙️ Recording...";
+      stopBtn.textContent = "🛑 Stop Recording";
+
+      mediaRecorder.ondataavailable = (e) => recordedChunks.push(e.data);
+    };
+
+    // Function to stop recording and process audio
+    stopBtn.onclick = () => {
+      mediaRecorder.stop();
+      recordBtn.disabled = false;
+      stopBtn.disabled = true;
+      recordBtn.textContent = "🎙️ Start Recording";
+
+      mediaRecorder.onstop = async () => {
+        const recordedBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+        const audioURL = URL.createObjectURL(recordedBlob);
+        recordedAudio.src = audioURL;
+        recordedAudio.style.display = "block";
+
+        // Upload recorded audio for processing
+        const formData = new FormData();
+        formData.append('audio', recordedBlob);
+
+        const response = await fetch('/process', { method: 'POST', body: formData });
+        const data = await response.json();
+
+        transcription.textContent = data.transcription;
+        sentiment.textContent = data.sentiment;
+        tone.textContent = data.tone;
+        intent.textContent = data.intent;
+        responseText.textContent = data.response;
+        playResponseBtn.disabled = false;
+
+        playResponseBtn.onclick = () => {
+          const responseAudio = new Audio('/response-audio');
+          responseAudio.play();
+        };
+      };
+    };
+
+    // Function to upload and process audio file
+    uploadBtn.onclick = async () => {
+      const file = audioFile.files[0];
+      if (!file) {
+        alert("Please upload an audio file first!");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('audio', file);
+
+      const response = await fetch('/process', { method: 'POST', body: formData });
+      const data = await response.json();
+
+      transcription.textContent = data.transcription;
+      sentiment.textContent = data.sentiment;
+      tone.textContent = data.tone;
+      intent.textContent = data.intent;
+      responseText.textContent = data.response;
+      playResponseBtn.disabled = false;
+
+      playResponseBtn.onclick = () => {
+        const responseAudio = new Audio('/response-audio');
+        responseAudio.play();
+      };
+    };
+  </script>
+</body>
+</html>
